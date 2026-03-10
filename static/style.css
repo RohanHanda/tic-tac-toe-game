@@ -1,0 +1,254 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Tic-Tac-Toe  —  Minimax AI  ·  Styles
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Reset & Base ──────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:          #0f172a;
+  --surface:     #1e293b;
+  --border:      #334155;
+  --text:        #f1f5f9;
+  --text-dim:    #94a3b8;
+  --x-color:     #38bdf8;   /* sky-400  */
+  --o-color:     #f472b6;   /* pink-400 */
+  --accent:      #818cf8;   /* indigo-400 */
+  --win-glow:    #34d399;   /* emerald-400 */
+  --draw-color:  #facc15;   /* yellow-400 */
+  --cell-size:   120px;
+  --gap:         8px;
+  --radius:      14px;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+/* ── Container ─────────────────────────────────────────────────── */
+.container {
+  text-align: center;
+  max-width: 480px;
+  width: 100%;
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+header h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.15rem;
+  background: linear-gradient(135deg, var(--x-color), var(--o-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  margin-bottom: 1.2rem;
+}
+
+.x-color { color: var(--x-color); font-weight: 700; }
+.o-color { color: var(--o-color); font-weight: 700; }
+
+/* ── Scoreboard ────────────────────────────────────────────────── */
+.scoreboard {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.score-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem 1.2rem;
+  min-width: 80px;
+}
+
+.score-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  margin-bottom: 0.15rem;
+}
+
+.score-value {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+/* ── Status ────────────────────────────────────────────────────── */
+.status {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 0.8rem;
+  min-height: 1.6rem;
+  transition: color 0.3s;
+}
+
+.status.win   { color: var(--win-glow); }
+.status.lose  { color: var(--o-color);  }
+.status.draw  { color: var(--draw-color); }
+
+/* ── Board ─────────────────────────────────────────────────────── */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, var(--cell-size));
+  grid-template-rows:    repeat(3, var(--cell-size));
+  gap: var(--gap);
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+/* ── Cells ─────────────────────────────────────────────────────── */
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s, box-shadow 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell:hover:not(.taken):not(.game-over) {
+  background: #263349;
+  border-color: var(--accent);
+  transform: scale(1.04);
+}
+
+.cell.taken {
+  cursor: default;
+}
+
+.cell.x { color: var(--x-color); }
+.cell.o { color: var(--o-color); }
+
+.cell.win-cell {
+  border-color: var(--win-glow);
+  box-shadow: 0 0 18px rgba(52, 211, 153, 0.45);
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { box-shadow: 0 0 10px rgba(52, 211, 153, 0.3); }
+  to   { box-shadow: 0 0 24px rgba(52, 211, 153, 0.6); }
+}
+
+/* pop-in when a mark is placed */
+.cell.pop {
+  animation: pop 0.25s ease;
+}
+
+@keyframes pop {
+  0%   { transform: scale(0.6); opacity: 0.4; }
+  60%  { transform: scale(1.12); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Buttons ───────────────────────────────────────────────────── */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 0.8rem;
+}
+
+.btn {
+  padding: 0.6rem 1.6rem;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn:active { transform: scale(0.96); }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover { background: #6366f1; }
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: #263349;
+  color: var(--text);
+}
+
+/* ── Difficulty toggle ─────────────────────────────────────────── */
+.difficulty {
+  margin-bottom: 1.2rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.difficulty input {
+  accent-color: var(--accent);
+  margin-right: 0.3rem;
+  transform: translateY(1px);
+}
+
+/* ── Footer ────────────────────────────────────────────────────── */
+footer {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+/* ── Thinking indicator ────────────────────────────────────────── */
+.thinking .cell:not(.taken) {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 440px) {
+  :root {
+    --cell-size: 90px;
+  }
+
+  header h1 { font-size: 1.8rem; }
+  .cell      { font-size: 2.2rem; }
+}
+
+@media (max-width: 340px) {
+  :root {
+    --cell-size: 75px;
+    --gap: 6px;
+  }
+}
