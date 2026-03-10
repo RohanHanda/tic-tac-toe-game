@@ -18,7 +18,6 @@ HUMAN = "X"
 
 
 # ── Board Helpers ────────────────────────────────────────────────────────────
-
 def get_available_moves(board: list[list[str]]) -> list[tuple[int, int]]:
     """Return all empty cell positions."""
     return [
@@ -27,6 +26,7 @@ def get_available_moves(board: list[list[str]]) -> list[tuple[int, int]]:
         for c in range(3)
         if board[r][c] == EMPTY
     ]
+
 
 def check_winner(board: list[list[str]]) -> str | None:
     """Return 'X', 'O', or None."""
@@ -43,8 +43,10 @@ def check_winner(board: list[list[str]]) -> str | None:
             return line[0]
     return None
 
+
 def is_terminal(board: list[list[str]]) -> bool:
     return check_winner(board) is not None or len(get_available_moves(board)) == 0
+
 
 def evaluate(board: list[list[str]]) -> int:
     winner = check_winner(board)
@@ -54,8 +56,8 @@ def evaluate(board: list[list[str]]) -> int:
         return -10
     return 0
 
-# ── Minimax ──────────────────────────────────────────────────────────────────
 
+# ── Minimax ──────────────────────────────────────────────────────────────────
 def minimax(board: list[list[str]], depth: int, is_maximizing: bool) -> int:
     if is_terminal(board):
         score = evaluate(board)
@@ -80,6 +82,7 @@ def minimax(board: list[list[str]], depth: int, is_maximizing: bool) -> int:
             board[r][c] = EMPTY
         return best
 
+
 def find_best_move(board: list[list[str]]) -> tuple[int, int]:
     best_score = -math.inf
     best_move = (-1, -1)
@@ -92,8 +95,8 @@ def find_best_move(board: list[list[str]]) -> tuple[int, int]:
             best_move = (r, c)
     return best_move
 
-# ── Winning line detection (for frontend highlight) ──────────────────────────
 
+# ── Winning line detection (for frontend highlight) ──────────────────────────
 def get_winning_line(board: list[list[str]]) -> list[list[int]] | None:
     """Return the three [row, col] cells that form the winning line, or None."""
     lines = []
@@ -110,19 +113,18 @@ def get_winning_line(board: list[list[str]]) -> list[list[int]] | None:
             return [[r, c] for r, c in line]
     return None
 
-# ── Routes ───────────────────────────────────────────────────────────────────
 
+# ── Routes ───────────────────────────────────────────────────────────────────
 @app.route("/")
 def index():
     return render_template("index.html")
 
 @app.route("/api/move", methods=["POST"])
 def api_move():
-    """
-    Receive the current board state, return the AI's best move.
+    """Receive the current board state, return the AI's best move.
 
     Request JSON:
-        { "board": [["X","",""], ["","O",""], ["","",""]] }
+        { "board": [["X","",""], ["","O",""], ["","",""]]} 
 
     Response JSON:
         { "row": 0, "col": 2, "winner": null, "winning_line": null, "draw": false }
@@ -157,8 +159,8 @@ def api_move():
         "draw": winner is None and len(get_available_moves(board)) == 0,
     })
 
-# ── Entry Point ──────────────────────────────────────────────────────────────
 
+# ── Entry Point ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
