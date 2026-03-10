@@ -31,14 +31,6 @@ The **Minimax algorithm** exhaustively searches every possible game state:
 └── README.md       # This file
 ```
 
-## Deploy on GitHub Pages
-
-1. Go to **Settings → Pages** in your repository.
-2. Under **Source**, select **Deploy from a branch**.
-3. Choose the **main** branch and **/ (root)** folder.
-4. Click **Save**.
-5. Your game will be live at `https://rohanhanda.github.io/tic-tac-toe-game/` in ~1 minute.
-
 ## Run Locally
 
 Just open `index.html` in any browser — no server required!
