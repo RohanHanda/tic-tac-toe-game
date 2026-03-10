@@ -1,0 +1,262 @@
+/* =================================================================
+   Tic-Tac-Toe — Client-Side Minimax AI
+   =================================================================
+   Entirely browser-based — no server needed.
+   Deploys on GitHub Pages as a static site.
+   ================================================================= */
+
+(() => {
+  "use strict";
+
+  const EMPTY = "";
+  const AI    = "O";
+  const HUMAN = "X";
+
+  const boardEl       = document.getElementById("board");
+  const statusEl      = document.getElementById("status");
+  const btnRestart    = document.getElementById("btn-restart");
+  const btnReset      = document.getElementById("btn-reset-scores");
+  const aiFirstCheck  = document.getElementById("ai-first");
+  const scoreHumanEl  = document.getElementById("score-human");
+  const scoreDrawEl   = document.getElementById("score-draw");
+  const scoreAIEl     = document.getElementById("score-ai");
+  const cells         = document.querySelectorAll(".cell");
+
+  let board    = [["","",""], ["","",""], ["","",""]];
+  let gameOver = false;
+  let locked   = false;
+  let scores   = { human: 0, ai: 0, draw: 0 };
+
+  // ================================================================
+  //  Board helpers
+  // ================================================================
+
+  function getAvailableMoves(b) {
+    const moves = [];
+    for (let r = 0; r < 3; r++)
+      for (let c = 0; c < 3; c++)
+        if (b[r][c] === EMPTY) moves.push([r, c]);
+    return moves;
+  }
+
+  function checkWinner(b) {
+    const lines = [
+      [[0,0],[0,1],[0,2]], [[1,0],[1,1],[1,2]], [[2,0],[2,1],[2,2]],
+      [[0,0],[1,0],[2,0]], [[0,1],[1,1],[2,1]], [[0,2],[1,2],[2,2]],
+      [[0,0],[1,1],[2,2]], [[0,2],[1,1],[2,0]],
+    ];
+    for (const line of lines) {
+      const [a, b2, c] = line;
+      const v = b[a[0]][a[1]];
+      if (v && v === b[b2[0]][b2[1]] && v === b[c[0]][c[1]]) return v;
+    }
+    return null;
+  }
+
+  function isTerminal(b) {
+    return checkWinner(b) !== null || getAvailableMoves(b).length === 0;
+  }
+
+  function evaluate(b) {
+    const w = checkWinner(b);
+    if (w === AI)    return 10;
+    if (w === HUMAN) return -10;
+    return 0;
+  }
+
+  function getWinningLine(b) {
+    const lines = [
+      [[0,0],[0,1],[0,2]], [[1,0],[1,1],[1,2]], [[2,0],[2,1],[2,2]],
+      [[0,0],[1,0],[2,0]], [[0,1],[1,1],[2,1]], [[0,2],[1,2],[2,2]],
+      [[0,0],[1,1],[2,2]], [[0,2],[1,1],[2,0]],
+    ];
+    for (const line of lines) {
+      const [a, b2, c] = line;
+      const v = b[a[0]][a[1]];
+      if (v && v === b[b2[0]][b2[1]] && v === b[c[0]][c[1]]) return line;
+    }
+    return null;
+  }
+
+  // ================================================================
+  //  Minimax algorithm (runs entirely in the browser)
+  // ================================================================
+
+  function minimax(b, depth, isMaximizing) {
+    if (isTerminal(b)) {
+      const score = evaluate(b);
+      if (score > 0)  return score - depth;   // prefer faster wins
+      if (score < 0)  return score + depth;   // prefer slower losses
+      return 0;
+    }
+
+    if (isMaximizing) {
+      let best = -Infinity;
+      for (const [r, c] of getAvailableMoves(b)) {
+        b[r][c] = AI;
+        best = Math.max(best, minimax(b, depth + 1, false));
+        b[r][c] = EMPTY;
+      }
+      return best;
+    } else {
+      let best = Infinity;
+      for (const [r, c] of getAvailableMoves(b)) {
+        b[r][c] = HUMAN;
+        best = Math.min(best, minimax(b, depth + 1, true));
+        b[r][c] = EMPTY;
+      }
+      return best;
+    }
+  }
+
+  function findBestMove(b) {
+    let bestScore = -Infinity;
+    let bestMove  = [-1, -1];
+    for (const [r, c] of getAvailableMoves(b)) {
+      b[r][c] = AI;
+      const score = minimax(b, 0, false);
+      b[r][c] = EMPTY;
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove  = [r, c];
+      }
+    }
+    return bestMove;
+  }
+
+  // ================================================================
+  //  Rendering
+  // ================================================================
+
+  function renderCell(cell, mark) {
+    cell.textContent = mark;
+    cell.classList.add("taken", mark.toLowerCase(), "pop");
+  }
+
+  function updateScoreboard() {
+    scoreHumanEl.textContent = scores.human;
+    scoreAIEl.textContent    = scores.ai;
+    scoreDrawEl.textContent  = scores.draw;
+  }
+
+  // ================================================================
+  //  Game flow
+  // ================================================================
+
+  function init() {
+    board    = [["","",""], ["","",""], ["","",""]];
+    gameOver = false;
+    locked   = false;
+
+    cells.forEach((c) => {
+      c.textContent = "";
+      c.className   = "cell";
+    });
+
+    boardEl.classList.remove("thinking");
+    statusEl.className = "status";
+
+    if (aiFirstCheck.checked) {
+      statusEl.textContent = "AI is thinking\u2026";
+      locked = true;
+      boardEl.classList.add("thinking");
+      setTimeout(doAIMove, 300);
+    } else {
+      statusEl.textContent = "Your turn \u2014 click a cell";
+    }
+  }
+
+  function doAIMove() {
+    const [r, c] = findBestMove(board);
+    board[r][c] = AI;
+    const idx = r * 3 + c;
+    renderCell(cells[idx], AI);
+
+    if (checkTerminalAndEnd()) return;
+
+    locked = false;
+    boardEl.classList.remove("thinking");
+    statusEl.textContent = "Your turn \u2014 click a cell";
+  }
+
+  function checkTerminalAndEnd() {
+    const winner = checkWinner(board);
+    if (winner) {
+      endGame(winner, getWinningLine(board));
+      return true;
+    }
+    if (getAvailableMoves(board).length === 0) {
+      endGame(null, null);
+      return true;
+    }
+    return false;
+  }
+
+  function handleCellClick(e) {
+    if (gameOver || locked) return;
+
+    const cell = e.currentTarget;
+    const r = parseInt(cell.dataset.row, 10);
+    const c = parseInt(cell.dataset.col, 10);
+
+    if (board[r][c] !== EMPTY) return;
+
+    // Place human mark
+    board[r][c] = HUMAN;
+    renderCell(cell, HUMAN);
+
+    if (checkTerminalAndEnd()) return;
+
+    // AI turn
+    locked = true;
+    boardEl.classList.add("thinking");
+    statusEl.textContent = "AI is thinking\u2026";
+    setTimeout(doAIMove, 250);
+  }
+
+  function endGame(winner, winningLine) {
+    gameOver = true;
+    locked   = false;
+    boardEl.classList.remove("thinking");
+
+    cells.forEach((c) => c.classList.add("game-over"));
+
+    if (winner === HUMAN) {
+      statusEl.textContent = "You win! \uD83C\uDF89";
+      statusEl.className   = "status win";
+      scores.human++;
+    } else if (winner === AI) {
+      statusEl.textContent = "AI wins! \uD83E\uDD16";
+      statusEl.className   = "status lose";
+      scores.ai++;
+    } else {
+      statusEl.textContent = "It's a draw! \uD83E\uDD1D";
+      statusEl.className   = "status draw";
+      scores.draw++;
+    }
+
+    updateScoreboard();
+
+    if (winningLine) {
+      for (const [r, c] of winningLine) {
+        cells[r * 3 + c].classList.add("win-cell");
+      }
+    }
+  }
+
+  // ================================================================
+  //  Event wiring
+  // ================================================================
+
+  cells.forEach((cell) => cell.addEventListener("click", handleCellClick));
+  btnRestart.addEventListener("click", init);
+  btnReset.addEventListener("click", () => {
+    scores = { human: 0, ai: 0, draw: 0 };
+    updateScoreboard();
+    init();
+  });
+  aiFirstCheck.addEventListener("change", init);
+
+  // Start
+  init();
+})();
