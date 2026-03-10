@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic-Tac-Toe — Minimax AI</title>
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+  />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>Tic‑Tac‑Toe</h1>
+      <p class="subtitle">You (<span class="x-color">X</span>) vs Minimax AI (<span class="o-color">O</span>)</p>
+    </header>
+
+    <!-- Scoreboard -->
+    <div class="scoreboard">
+      <div class="score-card">
+        <span class="score-label">You (X)</span>
+        <span class="score-value" id="score-human">0</span>
+      </div>
+      <div class="score-card draw-card">
+        <span class="score-label">Draws</span>
+        <span class="score-value" id="score-draw">0</span>
+      </div>
+      <div class="score-card">
+        <span class="score-label">AI (O)</span>
+        <span class="score-value" id="score-ai">0</span>
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div id="status" class="status">Your turn — click a cell</div>
+
+    <!-- Board -->
+    <div class="board" id="board">
+      <button class="cell" data-row="0" data-col="0"></button>
+      <button class="cell" data-row="0" data-col="1"></button>
+      <button class="cell" data-row="0" data-col="2"></button>
+      <button class="cell" data-row="1" data-col="0"></button>
+      <button class="cell" data-row="1" data-col="1"></button>
+      <button class="cell" data-row="1" data-col="2"></button>
+      <button class="cell" data-row="2" data-col="0"></button>
+      <button class="cell" data-row="2" data-col="1"></button>
+      <button class="cell" data-row="2" data-col="2"></button>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button id="btn-restart" class="btn btn-primary">New Game</button>
+      <button id="btn-reset-scores" class="btn btn-secondary">Reset Scores</button>
+    </div>
+
+    <!-- Difficulty selector -->
+    <div class="difficulty">
+      <label for="ai-first">
+        <input type="checkbox" id="ai-first" />
+        Let AI go first
+      </label>
+    </div>
+
+    <footer>
+      <p>Powered by the <strong>Minimax</strong> algorithm — the AI plays optimally and never loses.</p>
+    </footer>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
